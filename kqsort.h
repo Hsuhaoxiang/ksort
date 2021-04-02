@@ -9,7 +9,8 @@
 #define SMALL_SORT BITONIC_SORT
 
 #endif
-#define SIZE_MAX 18446744073709551615UL
+
+#define SIZE_MAX 2147483647
 #define SORT_CONCAT(x, y) x##_##y
 #define SORT_MAKE_STR1(x, y) SORT_CONCAT(x, y)
 #define SORT_MAKE_STR(x) SORT_MAKE_STR1(SORT_NAME, x)
@@ -26,6 +27,7 @@
 #define QUICK_SORT_RECURSIVE SORT_MAKE_STR(quick_sort_recursive)
 #define HEAP_SORT SORT_MAKE_STR(heap_sort)
 #define BITONIC_SORT SORT_MAKE_STR(bitonic_sort)
+
 
 #define SMALL_SORT_BND 16
 #define CLZ __builtin_clzll
@@ -231,9 +233,6 @@ static void QUICK_SORT_RECURSIVE(SORT_TYPE *dst,
 {
     int left;
     int right;
-    int pivot;
-    int new_pivot;
-    int middle;
     int loop_count = 0;
     const int max_loops = 64 - CLZ(original_right - original_left); /* ~lg N */
     left = original_left;

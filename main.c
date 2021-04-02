@@ -11,6 +11,21 @@
 #define DEVICE_NAME "xoroshiro128p"
 #define CLASS_NAME "xoro"
 
+#define SORT_NAME sorter
+#define SORT_TYPE int
+#define SORT_CMP(x, y) ((x) - (y))
+#define MAX(x, y) (((x) > (y) ? (x) : (y)))
+#define MIN(x, y) (((x) < (y) ? (x) : (y)))
+#define SORT_CSWAP(x, y)                           \
+    {                                              \
+        SORT_TYPE _sort_swap_temp = MAX((x), (y)); \
+        (x) = MIN((x), (y));                       \
+        (y) = _sort_swap_temp;                     \
+    }
+#include "kqsort.h"
+
+
+
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("National Cheng Kung University, Taiwan");
 MODULE_DESCRIPTION("sorting implementation");
@@ -89,9 +104,24 @@ static int __init xoro_init(void)
         r = (r * 725861) % 6599;
         a[i] = r;
     }
+    ktime_t ktime1 = ktime_get();
 
     sort_impl(a, TEST_LEN, sizeof(*a), cmpint, NULL);
 
+    ktime1 = ktime_sub(ktime_get(), ktime1);
+
+    for (i = 0; i < TEST_LEN; i++) {
+        r = (r * 725861) % 6599;
+        a[i] = r;
+    }
+    ktime_t ktime2 = ktime_get();
+
+    sorter_quick_sort(a, TEST_LEN);
+
+    ktime2 = ktime_sub(ktime_get(), ktime2);
+
+    printk(KERN_INFO "sort elapsed: %lld ns", ktime_to_ns(ktime1));
+    printk(KERN_INFO "quick sort elapsed: %lld ns", ktime_to_ns(ktime2));
     err = -EINVAL;
     for (i = 0; i < TEST_LEN - 1; i++)
         if (a[i] > a[i + 1]) {
